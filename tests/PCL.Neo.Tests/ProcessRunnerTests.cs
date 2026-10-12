@@ -15,10 +15,16 @@ public class ProcessRunnerTests
             ? ("cmd.exe", $"/c echo {text}")
             : ("/bin/echo", text);
 
-    private static (string FileName, string Arguments) PrintEnvCommand(string variable)
+    /// <summary>
+    /// 转储指定环境变量的状态。刻意避开 <c>echo %VAR%</c> 这类写法：
+    /// cmd 在变量未定义时会原样输出 <c>%VAR%</c>，用它做“变量不存在”的断言会误判。
+    /// Windows 用 <c>set VAR</c>（未定义时输出 "not defined"），Unix 直接跑 <c>env</c>，
+    /// 两边都不需要嵌套引号，跨 shell 行为稳定。
+    /// </summary>
+    private static (string FileName, string Arguments) EnvDumpCommand(string variable)
         => PlatformInfo.IsWindows
-            ? ("cmd.exe", $"/c echo %{variable}%")
-            : ("/bin/sh", $"-c \"echo ${variable}\"");
+            ? ("cmd.exe", $"/c set {variable}")
+            : ("/usr/bin/env", "");
 
     private static (string FileName, string Arguments) SleepCommand(int seconds)
         => PlatformInfo.IsWindows
@@ -61,7 +67,7 @@ public class ProcessRunnerTests
     {
         var runner = new ProcessRunner();
         const string variable = "PCL_NEO_TEST_MARKER";
-        var (file, args) = PrintEnvCommand(variable);
+        var (file, args) = EnvDumpCommand(variable);
 
         using var process = await runner.StartAsync(new ProcessLaunchRequest(
             file, args,
@@ -69,16 +75,15 @@ public class ProcessRunnerTests
 
         await process.WaitForExitAsync(CancellationToken.None);
 
-        Assert.Contains("marker-value", process.StandardOutput.Trim());
+        Assert.Contains($"{variable}=marker-value", process.StandardOutput);
     }
 
     [Fact]
     public async Task Null_Environment_Value_Removes_Variable()
     {
         var runner = new ProcessRunner();
-        // PATH 删掉后 cmd/sh 仍可执行内建命令，但子进程查询不到该变量
         const string variable = "PCL_NEO_REMOVED_MARKER";
-        var (file, args) = PrintEnvCommand(variable);
+        var (file, args) = EnvDumpCommand(variable);
 
         using var process = await runner.StartAsync(new ProcessLaunchRequest(
             file, args,
@@ -86,7 +91,8 @@ public class ProcessRunnerTests
 
         await process.WaitForExitAsync(CancellationToken.None);
 
-        Assert.DoesNotContain("PCL_NEO_REMOVED_MARKER", process.StandardOutput.Trim());
+        // 未定义时 cmd 输出 "not defined"、env 里根本没有这一行，两者都不会出现 "VAR="
+        Assert.DoesNotContain($"{variable}=", process.StandardOutput);
     }
 
     [Fact]
