@@ -1,0 +1,115 @@
+name: CI
+
+# 最小权限：本工作流不需要任何 secrets，也不得注入。
+# 参考 PCL-CE 的 fix-pr-build-secret-exposure-vulnerability —— fork PR 上
+# 任何带 secrets 的 job 都是攻击面，因此这里 permissions 只读。
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [next, main, dev]
+    paths-ignore: &ignored
+      - '**/*.md'
+      - 'LICENSE'
+      - 'NOTICE'
+      - '.gitignore'
+      - '.gitattributes'
+      - '.editorconfig'
+      - 'assets/**'
+      - '.github/ISSUE_TEMPLATE/**'
+  pull_request:
+    paths-ignore: *ignored
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: 1
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+
+jobs:
+  format:
+    name: 代码风格
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: 还原
+        run: dotnet restore PCL.Neo.slnx
+      - name: 校验格式（不改动文件）
+        run: dotnet format PCL.Neo.slnx --verify-no-changes --no-restore
+
+  build-test:
+    name: 构建与测试 (${{ matrix.os }} / ${{ matrix.rid }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # 覆盖 README 承诺的平台矩阵：三 OS + x64/ARM64。
+        # 无头 UI 冒烟测试在每个组合上真实运行，等价于“装好就能开窗口”。
+        include:
+          - os: linux
+            runner: ubuntu-latest
+            rid: linux-x64
+          - os: linux
+            runner: ubuntu-24.04-arm
+            rid: linux-arm64
+          - os: windows
+            runner: windows-latest
+            rid: win-x64
+          - os: macos
+            runner: macos-14
+            rid: osx-arm64
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - name: 构建
+        run: dotnet build PCL.Neo.slnx -c Release
+      - name: 测试
+        run: >-
+          dotnet test tests/PCL.Neo.Tests/PCL.Neo.Tests.csproj
+          -c Release --no-build
+
+  publish:
+    name: 产物 (${{ matrix.rid }})
+    needs: build-test
+    if: github.event_name != 'pull_request'
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            rid: linux-x64
+          - runner: ubuntu-24.04-arm
+            rid: linux-arm64
+          - runner: windows-latest
+            rid: win-x64
+          - runner: macos-14
+            rid: osx-arm64
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      # 框架依赖发布：与 PCL-CE 一致，要求用户自行安装 .NET 10 桌面运行时。
+      # 自包含单文件 / AppImage / .dmg / .msix 属于 M7 打包里程碑。
+      - name: 发布
+        run: >-
+          dotnet publish src/PCL.Neo.Desktop/PCL.Neo.Desktop.csproj
+          -c Release -r ${{ matrix.rid }} --self-contained false
+          -p:DebugType=none
+      - name: 上传产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: PCL.Neo-${{ matrix.rid }}
+          path: src/PCL.Neo.Desktop/bin/Release/net10.0/${{ matrix.rid }}/publish/
+          if-no-files-found: error
