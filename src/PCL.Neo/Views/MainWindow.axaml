@@ -3,18 +3,25 @@
         xmlns:vm="using:PCL.Neo.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d"
         x:Class="PCL.Neo.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="PCL.Neo">
+        Title="PCL.Neo"
+        Width="900" Height="580" MinWidth="720" MinHeight="460">
 
     <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    <!--
+      M0 首页壳：导航先借用 FluentTheme 的左侧 TabControl。
+      自绘导航条属于 PCL.Neo.UI 的后续控件工作，届时替换本节点即可，页面本身不受影响。
+      页面以 ViewModel 形式提供，由 App.axaml 中注册的 ViewLocator 解析成对应 View。
+    -->
+    <TabControl TabStripPlacement="Left" Margin="12" BorderThickness="0">
+        <TabItem Header="主页" Content="{Binding Home}" />
+        <TabItem Header="关于" Content="{Binding About}" />
+    </TabControl>
 
 </Window>

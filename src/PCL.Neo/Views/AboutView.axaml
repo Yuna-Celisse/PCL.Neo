@@ -1,0 +1,70 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PCL.Neo.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="460"
+             x:Class="PCL.Neo.Views.AboutView"
+             x:DataType="vm:AboutViewModel">
+
+    <ScrollViewer>
+        <StackPanel Margin="24" Spacing="18" MaxWidth="720" HorizontalAlignment="Left">
+
+            <StackPanel Spacing="6">
+                <TextBlock Text="关于 PCL.Neo" FontSize="24" FontWeight="SemiBold" />
+                <TextBlock Text="下一代跨平台 Minecraft 启动器（开发中）" Opacity="0.7" />
+            </StackPanel>
+
+            <!-- 《PCL 存储库合理使用指南》要求：首位为原作者署名与赞助入口，不可挪动位置 -->
+            <Border Padding="16" CornerRadius="8"
+                    BorderThickness="1"
+                    BorderBrush="{DynamicResource NeoSystemAccentColorStrokeBrush}"
+                    Background="{DynamicResource NeoControlFillColorDefaultBrush}">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="本项目是基于 PCL 独立进行二次创作的第三方产物，与 PCL 官方无关。"
+                               TextWrapping="Wrap" FontWeight="SemiBold" />
+                    <TextBlock TextWrapping="Wrap" Opacity="0.85"
+                               Text="PCL 由 龙腾猫跃 创作，如果你喜欢 PCL，请考虑赞助原作者。" />
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <Button Classes="accent" Content="赞助 龙腾猫跃"
+                                Command="{Binding OpenLinkCommand}"
+                                CommandParameter="{x:Static vm:AboutViewModel.AuthorSponsorUrl}" />
+                        <Button Content="PCL 主页"
+                                Command="{Binding OpenLinkCommand}"
+                                CommandParameter="{x:Static vm:AboutViewModel.UpstreamPclUrl}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <StackPanel Spacing="8">
+                <TextBlock Text="项目来源" FontSize="14" FontWeight="SemiBold" />
+                <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="14" RowSpacing="4">
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="上游（原作者）" Opacity="0.7" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="Meloong-Git/PCL" />
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="对标（社区版）" Opacity="0.7" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="PCL-Community/PCL-CE" />
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="本仓库" Opacity="0.7" />
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text="PCL-Community/PCL.Neo" />
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="许可指南" Opacity="0.7" />
+                    <TextBlock Grid.Row="3" Grid.Column="1" Text="《PCL 分发有限许可》/《PCL 存储库合理使用指南》" />
+                </Grid>
+                <TextBlock Text="许可矩阵见 docs/LICENSE.md 与仓库根 NOTICE 文件。"
+                           TextWrapping="Wrap" Opacity="0.6" FontSize="12" />
+            </StackPanel>
+
+            <StackPanel Spacing="8">
+                <TextBlock Text="许可证" FontSize="14" FontWeight="SemiBold" />
+                <TextBlock TextWrapping="Wrap" Opacity="0.85"
+                           Text="PCL.Neo 与 PCL.Neo.Desktop 遵循与 PCL 主线相同的指南；PCL.Neo.UI 使用 MIT License；PCL.Neo.Core 预留 Apache-2.0，用于承接自 PCL.Core 的移植代码。" />
+            </StackPanel>
+
+            <StackPanel Spacing="8">
+                <TextBlock Text="运行环境" FontSize="14" FontWeight="SemiBold" />
+                <TextBlock Opacity="0.85"
+                           Text="{Binding PlatformDescription, StringFormat='平台架构：{0}'}" />
+            </StackPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+
+</UserControl>

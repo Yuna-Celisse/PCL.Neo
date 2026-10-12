@@ -1,0 +1,62 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PCL.Neo.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="420"
+             x:Class="PCL.Neo.Views.HomeView"
+             x:DataType="vm:HomeViewModel">
+
+    <ScrollViewer>
+        <StackPanel Margin="24" Spacing="20" MaxWidth="720" HorizontalAlignment="Left">
+
+            <StackPanel Spacing="6">
+                <TextBlock Text="PCL.Neo" FontSize="30" FontWeight="SemiBold" />
+                <TextBlock Text="让跨平台 PCL 重获新生" Opacity="0.7" FontSize="14" />
+            </StackPanel>
+
+            <!-- 主题管线自检：这 5 条色带由 NeoTheme 从单一 accent 经 OKLCH 推导，
+                 深浅色切换时应整体重算，说明色彩系统已在主程序内生效。 -->
+            <Border Padding="16"
+                    Background="{DynamicResource NeoControlFillColorDefaultBrush}"
+                    BorderBrush="{DynamicResource NeoSystemAccentColorStrokeBrush}"
+                    BorderThickness="1" CornerRadius="8">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="主题系统已加载" FontSize="14" FontWeight="SemiBold" />
+                    <UniformGrid Columns="5" Rows="1">
+                        <Border Height="40" Margin="0,0,4,0" CornerRadius="4"
+                                Background="{DynamicResource NeoSystemAccentColorDark3Brush}" />
+                        <Border Height="40" Margin="4,0" CornerRadius="4"
+                                Background="{DynamicResource NeoSystemAccentColorDark1Brush}" />
+                        <Border Height="40" Margin="4,0" CornerRadius="4"
+                                Background="{DynamicResource NeoSystemAccentColorBrush}" />
+                        <Border Height="40" Margin="4,0" CornerRadius="4"
+                                Background="{DynamicResource NeoSystemAccentColorLight2Brush}" />
+                        <Border Height="40" Margin="4,0,0,0" CornerRadius="4"
+                                Background="{DynamicResource NeoSystemAccentColorLight5Brush}" />
+                    </UniformGrid>
+                    <StackPanel Orientation="Horizontal" Spacing="16">
+                        <Button Content="普通按钮" />
+                        <Button Classes="accent" Content="强调按钮" />
+                        <CheckBox Content="复选框" IsChecked="True" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <StackPanel Spacing="8">
+                <TextBlock Text="运行环境" FontSize="14" FontWeight="SemiBold" />
+                <TextBlock TextWrapping="Wrap" Opacity="0.85"
+                           Text="{Binding PlatformDescription, StringFormat='平台架构：{0}'}" />
+                <TextBlock TextWrapping="Wrap" Opacity="0.85"
+                           Text="{Binding OsDescription, StringFormat='系统描述：{0}'}" />
+                <TextBlock TextWrapping="Wrap" Opacity="0.85"
+                           Text="{Binding ConfigDirectory, StringFormat='配置目录：{0}'}" />
+            </StackPanel>
+
+            <TextBlock Text="启动器功能尚在开发中：当前版本仅包含跨平台地基（平台抽象、主题系统、页面骨架）。"
+                       TextWrapping="Wrap" Opacity="0.6" FontSize="12" />
+
+        </StackPanel>
+    </ScrollViewer>
+
+</UserControl>

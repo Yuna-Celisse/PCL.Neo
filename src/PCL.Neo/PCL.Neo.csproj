@@ -21,4 +21,9 @@
     </PackageReference>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PCL.Neo.Core\PCL.Neo.Core.csproj" />
+    <ProjectReference Include="..\PCL.Neo.UI\PCL.Neo.UI.csproj" />
+  </ItemGroup>
+
 </Project>
