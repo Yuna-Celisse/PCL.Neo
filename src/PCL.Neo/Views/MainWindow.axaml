@@ -7,19 +7,91 @@
         x:Class="PCL.Neo.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="PCL.Neo"
-        Width="920" Height="620" MinWidth="750" MinHeight="500">
+        Title="Plain Craft Launcher Neo"
+        Width="880" Height="540" MinWidth="810" MinHeight="480">
 
     <Design.DataContext>
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <!-- 侧边导航栏 -->
-    <TabControl TabStripPlacement="Left" Margin="12" BorderThickness="0">
-        <TabItem Header="主页" Content="{Binding Home}" />
-        <TabItem Header="版本下载" Content="{Binding Download}" />
-        <TabItem Header="实例管理" Content="{Binding Instances}" />
-        <TabItem Header="关于" Content="{Binding About}" />
-    </TabControl>
+    <Grid RowDefinitions="44,*">
+        <!-- 1. 顶部 Header 栏：经典 PCL 标志与色带 -->
+        <Border Grid.Row="0" Background="{DynamicResource NeoSystemAccentColorBrush}"
+                Padding="16,0">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <!-- 标志与标题 -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Spacing="10">
+                    <Border Width="24" Height="24" Background="White" CornerRadius="6"
+                            VerticalAlignment="Center">
+                        <TextBlock Text="P" Foreground="{DynamicResource NeoSystemAccentColorBrush}"
+                                   FontWeight="Black" FontSize="16"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <TextBlock Text="Plain Craft Launcher" Foreground="White"
+                               FontWeight="Bold" FontSize="15" VerticalAlignment="Center" />
+                    <Border Background="#33FFFFFF" CornerRadius="4" Padding="6,1" VerticalAlignment="Center">
+                        <TextBlock Text="Neo" Foreground="White" FontSize="11" FontWeight="SemiBold" />
+                    </Border>
+                </StackPanel>
+
+                <!-- 顶部导航选项卡 (PCL 风格 RadioButtons / Tab Strip) -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6">
+                    <RadioButton Classes="PclNav" Content="启动"
+                                 IsChecked="{Binding IsLaunchTabSelected}" />
+                    <RadioButton Classes="PclNav" Content="下载"
+                                 IsChecked="{Binding IsDownloadTabSelected}" />
+                    <RadioButton Classes="PclNav" Content="设置"
+                                 IsChecked="{Binding IsSettingsTabSelected}" />
+                    <RadioButton Classes="PclNav" Content="关于"
+                                 IsChecked="{Binding IsAboutTabSelected}" />
+                </StackPanel>
+
+                <!-- 右上角快捷状态 -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Spacing="8">
+                    <TextBlock Text="{Binding CurrentPlatformShort}" Foreground="#CCFFFFFF" FontSize="12" VerticalAlignment="Center" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- 2. 主体内容区：根据选中的 Tab 呈现对应视图 -->
+        <Border Grid.Row="1" Background="{DynamicResource NeoColorGray8Brush}">
+            <ContentControl Content="{Binding CurrentPageView}" />
+        </Border>
+    </Grid>
+
+    <Window.Styles>
+        <!-- 专为 PCL 顶部栏定制的扁平胶囊导航按钮样式 -->
+        <Style Selector="RadioButton.PclNav">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="#DFFFFFFF" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Padding" Value="14,6" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Name="RootBorder"
+                            Background="{TemplateBinding Background}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+
+        <Style Selector="RadioButton.PclNav:pointerover /template/ Border#RootBorder">
+            <Setter Property="Background" Value="#22FFFFFF" />
+        </Style>
+
+        <Style Selector="RadioButton.PclNav:checked">
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="RadioButton.PclNav:checked /template/ Border#RootBorder">
+            <Setter Property="Background" Value="#44FFFFFF" />
+        </Style>
+    </Window.Styles>
 
 </Window>

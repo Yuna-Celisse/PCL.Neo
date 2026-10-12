@@ -1,46 +1,116 @@
+using System;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using PCL.Neo.Core.Minecraft.Instances;
 using PCL.Neo.Core.Minecraft.Java;
+using PCL.Neo.Core.Minecraft.Launch;
+using PCL.Neo.Core.Minecraft.Manifest;
 using PCL.Neo.Core.Platform;
+using PCL.Neo.Services;
 
 namespace PCL.Neo.ViewModels;
 
-/// <summary>主页：展示运行环境、检测到的 Java 环境、以及启动器核心状态。</summary>
 public partial class HomeViewModel : ViewModelBase
 {
-    [ObservableProperty]
-    private string _statusMessage = "就绪";
+    private readonly LauncherService _service = LauncherService.Instance;
 
     [ObservableProperty]
-    private bool _isBusy;
+    private string _playerName = "Player";
 
-    public string PlatformDescription { get; } = PlatformInfo.Describe();
-    public string OsDescription { get; } = PlatformInfo.OsDescription;
-    public string ConfigDirectory { get; } = AppPaths.ConfigDirectory;
+    [ObservableProperty]
+    private LocalInstance? _selectedInstance;
 
-    public ObservableCollection<string> DetectedJavaList { get; } = [];
+    [ObservableProperty]
+    private string? _selectedJavaPath;
+
+    [ObservableProperty]
+    private string _launchStatusMessage = "就绪";
+
+    [ObservableProperty]
+    private bool _isLaunching;
+
+    public ObservableCollection<LocalInstance> Instances { get; } = [];
+    public ObservableCollection<string> JavaList { get; } = [];
 
     public HomeViewModel()
     {
-        ScanJavaCommand.Execute(null);
+        RefreshData();
     }
 
     [RelayCommand]
-    private void ScanJava()
+    public void RefreshData()
     {
-        DetectedJavaList.Clear();
-        var candidates = JavaLocator.EnumerateCandidates();
-        if (candidates.Count == 0)
+        // 1. 刷新版本列表
+        Instances.Clear();
+        var list = _service.Instances.ScanInstances();
+        foreach (var inst in list) Instances.Add(inst);
+        if (Instances.Count > 0 && SelectedInstance is null)
         {
-            DetectedJavaList.Add("未在标准路径发现已安装的 Java 环境");
+            SelectedInstance = Instances[0];
         }
-        else
+
+        // 2. 刷新 Java
+        JavaList.Clear();
+        var javas = JavaLocator.EnumerateCandidates();
+        foreach (var j in javas) JavaList.Add(j.Executable);
+        if (JavaList.Count > 0 && SelectedJavaPath is null)
         {
-            foreach (var c in candidates)
+            SelectedJavaPath = JavaList[0];
+        }
+    }
+
+    [RelayCommand]
+    private async Task LaunchGameAsync()
+    {
+        if (IsLaunching) return;
+
+        if (SelectedInstance is null)
+        {
+            LaunchStatusMessage = "请先选择或安装一个游戏版本！";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(SelectedJavaPath) || !File.Exists(SelectedJavaPath))
+        {
+            LaunchStatusMessage = "未选择有效的 Java 路径，请在下拉框中选择！";
+            return;
+        }
+
+        if (SelectedInstance.Version is null)
+        {
+            LaunchStatusMessage = "该实例的清单文件损坏";
+            return;
+        }
+
+        IsLaunching = true;
+        LaunchStatusMessage = $"正在准备启动 {SelectedInstance.Id}...";
+
+        try
+        {
+            var options = new LaunchOptions(
+                JavaExecutable: SelectedJavaPath,
+                PlayerName: string.IsNullOrWhiteSpace(PlayerName) ? "Player" : PlayerName,
+                MaxMemoryMb: 2048);
+
+            var runtime = RuntimeValue.ForCurrentPlatform(PlatformInfo.Platform, PlatformInfo.Architecture);
+
+            var process = await _service.Launcher.LaunchAsync(SelectedInstance.Version, options, runtime);
+            LaunchStatusMessage = $"游戏已启动 (PID: {process.Pid})！正在运行...";
+
+            _ = Task.Run(async () =>
             {
-                DetectedJavaList.Add($"{c.Executable} ({c.Source})");
-            }
+                var code = await process.WaitForExitAsync();
+                LaunchStatusMessage = $"游戏已退出 (代码: {code})";
+                IsLaunching = false;
+            });
+        }
+        catch (Exception ex)
+        {
+            LaunchStatusMessage = $"启动失败: {ex.Message}";
+            IsLaunching = false;
         }
     }
 }

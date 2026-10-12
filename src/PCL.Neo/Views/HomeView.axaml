@@ -1,78 +1,141 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:PCL.Neo.ViewModels"
+             xmlns:inst="using:PCL.Neo.Core.Minecraft.Instances"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="420"
+             mc:Ignorable="d" d:DesignWidth="880" d:DesignHeight="500"
              x:Class="PCL.Neo.Views.HomeView"
              x:DataType="vm:HomeViewModel">
 
-    <ScrollViewer>
-        <StackPanel Margin="24" Spacing="20" MaxWidth="720" HorizontalAlignment="Left">
-
-            <StackPanel Spacing="6">
-                <TextBlock Text="PCL.Neo" FontSize="30" FontWeight="SemiBold" />
-                <TextBlock Text="让跨平台 PCL 重获新生" Opacity="0.7" FontSize="14" />
-            </StackPanel>
-
-            <!-- 主题管线自检：这 5 条色带由 NeoTheme 从单一 accent 经 OKLCH 推导，
-                 深浅色切换时应整体重算，说明色彩系统已在主程序内生效。 -->
-            <Border Padding="16"
-                    Background="{DynamicResource NeoControlFillColorDefaultBrush}"
-                    BorderBrush="{DynamicResource NeoSystemAccentColorStrokeBrush}"
-                    BorderThickness="1" CornerRadius="8">
-                <StackPanel Spacing="12">
-                    <TextBlock Text="主题系统已加载" FontSize="14" FontWeight="SemiBold" />
-                    <UniformGrid Columns="5" Rows="1">
-                        <Border Height="40" Margin="0,0,4,0" CornerRadius="4"
-                                Background="{DynamicResource NeoSystemAccentColorDark3Brush}" />
-                        <Border Height="40" Margin="4,0" CornerRadius="4"
-                                Background="{DynamicResource NeoSystemAccentColorDark1Brush}" />
-                        <Border Height="40" Margin="4,0" CornerRadius="4"
-                                Background="{DynamicResource NeoSystemAccentColorBrush}" />
-                        <Border Height="40" Margin="4,0" CornerRadius="4"
-                                Background="{DynamicResource NeoSystemAccentColorLight2Brush}" />
-                        <Border Height="40" Margin="4,0,0,0" CornerRadius="4"
-                                Background="{DynamicResource NeoSystemAccentColorLight5Brush}" />
-                    </UniformGrid>
-                    <StackPanel Orientation="Horizontal" Spacing="16">
-                        <Button Content="普通按钮" />
-                        <Button Classes="accent" Content="强调按钮" />
-                        <CheckBox Content="复选框" IsChecked="True" />
-                    </StackPanel>
-                </StackPanel>
-            </Border>
-
-            <StackPanel Spacing="8">
-                <TextBlock Text="运行环境" FontSize="14" FontWeight="SemiBold" />
-                <TextBlock TextWrapping="Wrap" Opacity="0.85"
-                           Text="{Binding PlatformDescription, StringFormat='平台架构：{0}'}" />
-                <TextBlock TextWrapping="Wrap" Opacity="0.85"
-                           Text="{Binding OsDescription, StringFormat='系统描述：{0}'}" />
-                <TextBlock TextWrapping="Wrap" Opacity="0.85"
-                           Text="{Binding ConfigDirectory, StringFormat='配置目录：{0}'}" />
-            </StackPanel>
-
-            <StackPanel Spacing="8">
-                <StackPanel Orientation="Horizontal" Spacing="12">
-                    <TextBlock Text="本地 Java 探测" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
-                    <Button Content="重新扫描" Command="{Binding ScanJavaCommand}" Padding="8,4" />
-                </StackPanel>
-                <ItemsControl ItemsSource="{Binding DetectedJavaList}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border Margin="0,2" Padding="8,6" Background="{DynamicResource NeoColorGray7Brush}" CornerRadius="4">
-                                <TextBlock Text="{Binding}" FontSize="12" FontFamily="Consolas, monospace" Opacity="0.9" TextWrapping="Wrap" />
+    <Grid ColumnDefinitions="310,*">
+        <!-- 左侧控制面板 (Left Panel) -->
+        <Border Grid.Column="0" Background="{DynamicResource NeoColorGray7Brush}"
+                BorderBrush="{DynamicResource NeoColorGray6Brush}" BorderThickness="0,0,1,0"
+                Padding="24,20">
+            <Grid RowDefinitions="Auto,*,Auto" VerticalAlignment="Stretch">
+                <!-- 顶部：玩家身份卡片 -->
+                <StackPanel Grid.Row="0" Spacing="14">
+                    <TextBlock Text="玩家离线身份" FontWeight="SemiBold" FontSize="13" Opacity="0.75" />
+                    <Border Background="{DynamicResource NeoColorGray8Brush}" CornerRadius="8" Padding="12"
+                            BorderBrush="{DynamicResource NeoColorGray5Brush}" BorderThickness="1">
+                        <Grid ColumnDefinitions="Auto,*">
+                            <!-- 简易玩家头像占位 -->
+                            <Border Grid.Column="0" Width="38" Height="38" Background="{DynamicResource NeoSystemAccentColorLight3Brush}"
+                                    CornerRadius="6" Margin="0,0,12,0">
+                                <TextBlock Text="S" FontWeight="Bold" Foreground="White" FontSize="18"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                            <TextBox Grid.Column="1" Text="{Binding PlayerName}" Watermark="输入游戏昵称"
+                                     VerticalAlignment="Center" />
+                        </Grid>
+                    </Border>
+                </StackPanel>
+
+                <!-- 中间：Java 运行时选择 -->
+                <StackPanel Grid.Row="1" Spacing="8" Margin="0,20,0,0">
+                    <TextBlock Text="Java 运行时" FontWeight="SemiBold" FontSize="13" Opacity="0.75" />
+                    <ComboBox ItemsSource="{Binding JavaList}"
+                              SelectedItem="{Binding SelectedJavaPath}"
+                              HorizontalAlignment="Stretch">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" FontSize="12" TextTrimming="CharacterEllipsis" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+
+                <!-- 底部：PCL 经典巨型启动按钮 -->
+                <StackPanel Grid.Row="2" Spacing="10" Margin="0,0,0,8">
+                    <TextBlock Text="{Binding LaunchStatusMessage}" FontSize="12" Opacity="0.75"
+                               HorizontalAlignment="Center" TextWrapping="Wrap" />
+
+                    <!-- 标志性的巨大启动胶囊按钮 -->
+                    <Button Classes="PclLaunch" Command="{Binding LaunchGameCommand}"
+                            IsEnabled="{Binding !IsLaunching}"
+                            HorizontalAlignment="Stretch" Height="52">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+                            <!-- 播放三角图标 -->
+                            <Path Data="M 0,0 L 0,16 L 14,8 Z" Fill="White" VerticalAlignment="Center" />
+                            <TextBlock Text="启动游戏" FontWeight="Black" FontSize="18" Foreground="White"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- 右侧内容面板 (Right Panel) - 版本卡片与信息流 -->
+        <ScrollViewer Grid.Column="1" Margin="24,20">
+            <StackPanel Spacing="16" MaxWidth="620" HorizontalAlignment="Left">
+                <!-- 提示卡片 -->
+                <Border Background="{DynamicResource NeoColorGray8Brush}" CornerRadius="10" Padding="18,14"
+                        BorderBrush="{DynamicResource NeoColorGray6Brush}" BorderThickness="1">
+                    <Grid ColumnDefinitions="Auto,*">
+                        <TextBlock Grid.Column="0" Text="📢" FontSize="18" Margin="0,0,12,0" VerticalAlignment="Top" />
+                        <StackPanel Grid.Column="1" Spacing="4">
+                            <TextBlock Text="欢迎使用 PCL.Neo 跨平台重构版" FontWeight="Bold" FontSize="14" />
+                            <TextBlock Text="原生 Avalonia 自绘驱动，纯正 .NET 10 强力运行，已适配 Linux / macOS / Windows。"
+                                       Opacity="0.75" FontSize="12" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- 当前选中的版本大卡片 -->
+                <Border Background="{DynamicResource NeoColorGray8Brush}" CornerRadius="10" Padding="20"
+                        BorderBrush="{DynamicResource NeoSystemAccentColorStrokeBrush}" BorderThickness="1">
+                    <StackPanel Spacing="12">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Grid.Column="0" Text="当前选中的游戏版本" FontWeight="SemiBold" FontSize="14" Opacity="0.8" />
+                            <Button Grid.Column="1" Content="刷新版本" Command="{Binding RefreshDataCommand}" Padding="8,3" FontSize="12" />
+                        </Grid>
+
+                        <ComboBox ItemsSource="{Binding Instances}"
+                                  SelectedItem="{Binding SelectedInstance}"
+                                  HorizontalAlignment="Stretch">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="inst:LocalInstance">
+                                    <StackPanel Spacing="2" Margin="2,4">
+                                        <TextBlock Text="{Binding Id}" FontWeight="Bold" FontSize="14" />
+                                        <TextBlock Text="{Binding DirectoryPath}" Opacity="0.6" FontSize="11" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+                </Border>
+
+                <!-- 社区与开源指引卡片 -->
+                <Border Background="{DynamicResource NeoColorGray8Brush}" CornerRadius="10" Padding="18"
+                        BorderBrush="{DynamicResource NeoColorGray6Brush}" BorderThickness="1">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="关于重构" FontWeight="Bold" FontSize="14" />
+                        <TextBlock Text="本项目依照《PCL 存储库合理使用指南》对 PCL 进行非商业性独立二次开发，核心库与 UI 完全解耦，实现 Linux 和其他架构平台的原生支持。"
+                                   Opacity="0.75" FontSize="12" TextWrapping="Wrap" />
+                    </StackPanel>
+                </Border>
             </StackPanel>
+        </ScrollViewer>
+    </Grid>
 
-            <TextBlock Text="启动器功能尚在开发中：当前版本仅包含跨平台地基（平台抽象、主题系统、页面骨架）。"
-                       TextWrapping="Wrap" Opacity="0.6" FontSize="12" />
-
-        </StackPanel>
-    </ScrollViewer>
+    <UserControl.Styles>
+        <Style Selector="Button.PclLaunch">
+            <Setter Property="Background" Value="{DynamicResource NeoSystemAccentColorBrush}" />
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Duration="0:0:0.15" Property="Background" />
+                    <TransformOperationsTransition Duration="0:0:0.15" Property="RenderTransform" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Button.PclLaunch:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource NeoSystemAccentColorLight2Brush}" />
+        </Style>
+        <Style Selector="Button.PclLaunch:pressed">
+            <Setter Property="RenderTransform" Value="scale(0.97)" />
+        </Style>
+    </UserControl.Styles>
 
 </UserControl>
