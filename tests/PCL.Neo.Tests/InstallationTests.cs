@@ -142,6 +142,14 @@ public class InstallationPlannerTests
           ] }
         """;
 
+    /// <summary>
+    /// 用 layout 自身推导期望路径。硬编码 "/mc/..." 在 Windows 上必然失败：
+    /// Path.GetFullPath("/mc") 会落到当前盘符，分隔符也变成反斜杠。
+    /// </summary>
+    private static string Expect(MinecraftLayout layout, params string[] relativeParts)
+        => Path.Combine(layout.Root,
+            Path.Combine(relativeParts).Replace('/', Path.DirectorySeparatorChar));
+
     private static AssetIndex SampleAssetIndex() => AssetIndex.Parse("""
         { "objects": {
             "icons/minecraft.icns": { "hash": "03c27cd7b0e6a4b7c8d9e0f1a2b3c4d5e6f70809", "size": 114190 },
@@ -158,21 +166,21 @@ public class InstallationPlannerTests
 
         var byDestination = plan.Downloads.ToDictionary(d => d.Destination, StringComparer.Ordinal);
 
-        Assert.True(byDestination.ContainsKey("/mc/versions/1.20.1/1.20.1.jar"));
-        Assert.Equal("c1", byDestination["/mc/versions/1.20.1/1.20.1.jar"].Sha1);
+        Assert.True(byDestination.ContainsKey(Expect(layout, "versions", "1.20.1", "1.20.1.jar")));
+        Assert.Equal("c1", byDestination[Expect(layout, "versions", "1.20.1", "1.20.1.jar")].Sha1);
 
-        Assert.True(byDestination.ContainsKey("/mc/libraries/com/google/code/gson/gson/2.10.1/gson-2.10.1.jar"));
-        Assert.True(byDestination.ContainsKey("/mc/libraries/org/lwjgl/lwjgl/3.3.1/lwjgl-3.3.1-natives-linux.jar"));
+        Assert.True(byDestination.ContainsKey(Expect(layout, "libraries", "com/google/code/gson/gson/2.10.1/gson-2.10.1.jar")));
+        Assert.True(byDestination.ContainsKey(Expect(layout, "libraries", "org/lwjgl/lwjgl/3.3.1/lwjgl-3.3.1-natives-linux.jar")));
 
         // 无 downloads 的库按坐标推导，走默认仓库
-        var netty = byDestination["/mc/libraries/io/netty/netty-all/4.0.23.Final/netty-all-4.0.23.Final.jar"];
+        var netty = byDestination[Expect(layout, "libraries", "io/netty/netty-all/4.0.23.Final/netty-all-4.0.23.Final.jar")];
         Assert.Equal("https://libraries.minecraft.net/io/netty/netty-all/4.0.23.Final/netty-all-4.0.23.Final.jar", netty.Url);
         Assert.Null(netty.Sha1);
 
         // 资源索引与对象
-        Assert.True(byDestination.ContainsKey("/mc/assets/indexes/12.json"));
-        Assert.True(byDestination.ContainsKey(
-            "/mc/assets/objects/03/03c27cd7b0e6a4b7c8d9e0f1a2b3c4d5e6f70809"));
+        Assert.True(byDestination.ContainsKey(Expect(layout, "assets", "indexes", "12.json")));
+        Assert.True(byDestination.ContainsKey(Expect(layout, "assets", "objects", "03",
+            "03c27cd7b0e6a4b7c8d9e0f1a2b3c4d5e6f70809")));
     }
 
     [Fact]
@@ -200,7 +208,7 @@ public class InstallationPlannerTests
         var plan = InstallationPlanner.Build(version, layout, LinuxX64);
 
         Assert.Equal(plan.Classpath.Count, plan.Classpath.Distinct(StringComparer.Ordinal).Count());
-        Assert.Equal("/mc/libraries/com/google/code/gson/gson/2.10.1/gson-2.10.1.jar", plan.Classpath[0]);
+        Assert.Equal(Expect(layout, "libraries", "com/google/code/gson/gson/2.10.1/gson-2.10.1.jar"), plan.Classpath[0]);
         // gson + lwjgl-natives-linux + netty；osx 专用库被规则过滤掉
         Assert.Equal(3, plan.Classpath.Count);
     }
@@ -212,7 +220,8 @@ public class InstallationPlannerTests
         var layout = new MinecraftLayout("/mc");
 
         var plan = InstallationPlanner.Build(version, layout, LinuxX64, SampleAssetIndex());
-        var asset = plan.Downloads.First(d => d.Destination.Contains("/assets/objects/", StringComparison.Ordinal));
+        var asset = plan.Downloads.First(d => d.Destination.StartsWith(layout.AssetsDirectory + Path.DirectorySeparatorChar, StringComparison.Ordinal)
+                                                      && d.Destination.Contains("objects", StringComparison.Ordinal));
 
         Assert.Equal(Path.GetFileName(asset.Destination), asset.Sha1);
         Assert.StartsWith("https://resources.download.minecraft.net/", asset.Url, StringComparison.Ordinal);
