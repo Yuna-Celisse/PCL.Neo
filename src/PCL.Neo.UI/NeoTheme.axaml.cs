@@ -9,7 +9,7 @@ namespace PCL.Neo.UI;
 public class NeoTheme : Avalonia.Styling.Styles
 {
     public event EventHandler<RefreshedEventArgs>? Refreshed;
-    
+
     public static NeoTheme? Current { get; private set; }
 
     public Color AccentColor
@@ -36,7 +36,7 @@ public class NeoTheme : Avalonia.Styling.Styles
                 return;
 
             _colorPalette = value;
-            
+
             Refresh(false);
         }
     }
@@ -61,7 +61,7 @@ public class NeoTheme : Avalonia.Styling.Styles
         {
             _accentColor = ColorPalette.Accent;
         }
-        
+
         Refreshed?.Invoke(this, new RefreshedEventArgs(ColorPalette));
     }
 }

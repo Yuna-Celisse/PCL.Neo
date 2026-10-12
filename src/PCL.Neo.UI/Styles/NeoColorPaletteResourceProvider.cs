@@ -17,12 +17,12 @@ public class NeoColorPaletteResourceProvider : ResourceProvider
     public const string AccentLight6Key = "NeoSystemAccentColorLight6";
     public const string AccentStrokeKey = "NeoSystemAccentColorStroke";
     public const string AccentPressedKey = "NeoSystemAccentColorPressed";
-    
+
     private NeoColorPalette _palette = null!;
     private NeoTheme? _theme;
-    
+
     public override bool HasResources => true;
-    
+
     public override bool TryGetResource(object key, ThemeVariant? theme, out object? value)
     {
         if (key is string strKey)
@@ -51,7 +51,7 @@ public class NeoColorPaletteResourceProvider : ResourceProvider
 
         return value != null;
     }
-    
+
     protected override void OnAddOwner(IResourceHost owner)
     {
         base.OnAddOwner(owner);
@@ -68,10 +68,10 @@ public class NeoColorPaletteResourceProvider : ResourceProvider
             _theme.Refreshed -= CurrentOnRefreshed;
             _theme = null;
         }
-        
+
         base.OnRemoveOwner(owner);
     }
-    
+
     private void CurrentOnRefreshed(object? sender, RefreshedEventArgs e)
     {
         _palette = e.Palette;

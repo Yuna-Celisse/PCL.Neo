@@ -7,7 +7,7 @@ public readonly struct OklchColor : IEquatable<OklchColor>
 {
     public double L { get; }
     public double C { get; }
-    public double H { get; } 
+    public double H { get; }
     public double A { get; }
 
     public OklchColor(double l, double c, double h, double a = 1)
@@ -17,11 +17,11 @@ public readonly struct OklchColor : IEquatable<OklchColor>
         H = h;
         A = Math.Clamp(a, 0.0, 1.0);
     }
-    
+
     public OklchColor(Color color)
     {
         var oklch = color.ToOklch();
-        
+
         L = oklch.L;
         C = oklch.C;
         H = oklch.H;
@@ -38,12 +38,12 @@ public readonly struct OklchColor : IEquatable<OklchColor>
         var (oklabL, oklabA, oklabB) = ColorUtils.OklchToOklab(l, c, h);
         var (linearR, linearG, linearB) = ColorUtils.OklabToLinearRgb(oklabL, oklabA, oklabB);
         var (r, g, b) = ColorUtils.LinearRgbToRgb(linearR, linearG, linearB);
-        
+
         var rgbA = (byte)Math.Round(a * 255.0);
-        
+
         return Color.FromArgb(rgbA, r, g, b);
     }
-    
+
     public bool Equals(OklchColor other) =>
         // ReSharper disable once CompareOfFloatsByEqualityOperator
         L == other.L &&

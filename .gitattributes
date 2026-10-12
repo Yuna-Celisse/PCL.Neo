@@ -1,0 +1,25 @@
+# 跨平台仓库：仓库内统一 LF，检出时不转换，避免 Windows 贡献者静默改写全文件。
+* text=auto eol=lf
+
+*.cs     text eol=lf diff=csharp
+*.axaml  text eol=lf
+*.xaml   text eol=lf
+*.csproj text eol=lf
+*.props  text eol=lf
+*.targets text eol=lf
+*.json   text eol=lf
+*.yml    text eol=lf
+*.md     text eol=lf
+
+# 二进制：禁止合并尝试
+*.png    binary
+*.jpg    binary
+*.ico    binary
+*.icns   binary
+*.ttf    binary
+*.otf    binary
+*.dll    binary
+*.so     binary
+*.dylib  binary
+*.zip    binary
+*.pdb    binary
