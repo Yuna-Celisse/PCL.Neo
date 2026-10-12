@@ -3,7 +3,12 @@ using System.Text.Json.Serialization;
 
 namespace PCL.Neo.Core.Minecraft.Manifest;
 
-public sealed record DownloadSpec(string? Url, string? Sha1, long? Size);
+/// <summary>
+/// 清单里的一个下载描述。注意 <c>path</c> 与 <c>url</c> 是两个字段：
+/// path 是相对仓库的路径（用于本地落盘与镜像改写），url 是绝对地址。
+/// 只存 url 会让本地路径退化成坐标推导，与清单声明不一致。
+/// </summary>
+public sealed record DownloadSpec(string? Url, string? Sha1, long? Size, string? Path = null);
 
 public sealed class AssetIndexSpec
 {

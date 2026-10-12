@@ -71,8 +71,8 @@ public sealed class LibraryInfo
         // 1) 主产物。原生库条目通常没有 artifact，只有 classifiers。
         if (Downloads?.Artifact is { } artifact)
         {
-            yield return new(null, artifact.Url ?? coordinate.Path,
-                Absolute(artifact.Url), artifact.Sha1, artifact.Size);
+            yield return new(null, artifact.Path ?? coordinate.Path,
+                artifact.Url ?? Absolute(artifact.Path ?? coordinate.Path), artifact.Sha1, artifact.Size);
         }
         else if (classifier is null)
         {
@@ -86,8 +86,9 @@ public sealed class LibraryInfo
         if (Downloads?.Classifiers is { } classifiers
             && classifiers.TryGetValue(classifier, out var spec) && spec is not null)
         {
-            yield return new(classifier, spec.Url ?? coordinate.Path.WithClassifier(classifier),
-                Absolute(spec.Url), spec.Sha1, spec.Size);
+            var classifierPath = spec.Path ?? coordinate.Path.WithClassifier(classifier);
+            yield return new(classifier, classifierPath,
+                spec.Url ?? Absolute(classifierPath), spec.Sha1, spec.Size);
             yield break;
         }
 
