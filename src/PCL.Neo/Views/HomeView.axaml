@@ -53,6 +53,22 @@
                            Text="{Binding ConfigDirectory, StringFormat='配置目录：{0}'}" />
             </StackPanel>
 
+            <StackPanel Spacing="8">
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <TextBlock Text="本地 Java 探测" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
+                    <Button Content="重新扫描" Command="{Binding ScanJavaCommand}" Padding="8,4" />
+                </StackPanel>
+                <ItemsControl ItemsSource="{Binding DetectedJavaList}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Margin="0,2" Padding="8,6" Background="{DynamicResource NeoColorGray7Brush}" CornerRadius="4">
+                                <TextBlock Text="{Binding}" FontSize="12" FontFamily="Consolas, monospace" Opacity="0.9" TextWrapping="Wrap" />
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+
             <TextBlock Text="启动器功能尚在开发中：当前版本仅包含跨平台地基（平台抽象、主题系统、页面骨架）。"
                        TextWrapping="Wrap" Opacity="0.6" FontSize="12" />
 
