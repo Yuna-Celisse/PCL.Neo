@@ -3,5 +3,6 @@
   <Project Path="src/PCL.Neo.Desktop/PCL.Neo.Desktop.csproj" />
   <Project Path="src/PCL.Neo.UI/PCL.Neo.UI.csproj" />
   <Project Path="src/PCL.Neo/PCL.Neo.csproj" />
+  <Project Path="tests/PCL.Neo.Tests/PCL.Neo.Tests.csproj" />
   <Project Path="tests/PCL.Neo.UI.Gallery/PCL.Neo.UI.Gallery.csproj" />
 </Solution>
