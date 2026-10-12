@@ -1,5 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <!--
+    许可提示：本项目用于承接自 PCL.Core (Apache-2.0) 的移植代码。
+    一旦引入移植文件，须在此设置 <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    并在仓库根 NOTICE 登记。详见 docs/LICENSE.md。
+  -->
+
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <LangVersion>latest</LangVersion>
