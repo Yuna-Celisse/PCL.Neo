@@ -1,0 +1,67 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:PCL.Neo.ViewModels"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="500"
+             x:Class="PCL.Neo.Views.InstancesView"
+             x:DataType="vm:InstancesViewModel">
+
+    <Grid RowDefinitions="Auto,*,Auto" Margin="24">
+        <!-- 头部 -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,16">
+            <StackPanel Grid.Column="0" Spacing="4">
+                <TextBlock Text="实例管理" FontSize="24" FontWeight="SemiBold" />
+                <TextBlock Text="扫描并启动本地已安装的 Minecraft 版本" Opacity="0.7" FontSize="13" />
+            </StackPanel>
+            <Button Grid.Column="1" Content="刷新列表" Command="{Binding RefreshInstancesCommand}" VerticalAlignment="Center" />
+        </Grid>
+
+        <!-- 实例列表 -->
+        <Border Grid.Row="1" Background="{DynamicResource NeoControlFillColorDefaultBrush}"
+                BorderBrush="{DynamicResource NeoSystemAccentColorStrokeBrush}"
+                BorderThickness="1" CornerRadius="8" Padding="8">
+            <ListBox ItemsSource="{Binding Instances}"
+                     SelectedItem="{Binding SelectedInstance}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:LocalInstanceItemViewModel">
+                        <StackPanel Margin="6,6" Spacing="4">
+                            <TextBlock Text="{Binding Id}" FontSize="15" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding Details}" FontSize="12" Opacity="0.75" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
+
+        <!-- 启动参数设置与启动按钮 -->
+        <Border Grid.Row="2" Margin="0,16,0,0" Padding="16"
+                Background="{DynamicResource NeoControlFillColorDefaultBrush}"
+                BorderBrush="{DynamicResource NeoSystemAccentColorStrokeBrush}"
+                BorderThickness="1" CornerRadius="8">
+            <StackPanel Spacing="14">
+                <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="10">
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="玩家名" VerticalAlignment="Center" />
+                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding PlayerName}" />
+
+                    <TextBlock Grid.Row="0" Grid.Column="2" Text="最大内存 (MB)" VerticalAlignment="Center" />
+                    <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding MaxMemoryMb}" />
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Java 运行时" VerticalAlignment="Center" />
+                    <ComboBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3"
+                              ItemsSource="{Binding JavaPaths}"
+                              SelectedItem="{Binding SelectedJavaPath}"
+                              HorizontalAlignment="Stretch" />
+                </Grid>
+
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Grid.Column="0" Text="{Binding StatusMessage}" VerticalAlignment="Center" Opacity="0.85" TextWrapping="Wrap" />
+                    <Button Grid.Column="1" Classes="accent" Content="启动游戏"
+                            Command="{Binding LaunchSelectedInstanceCommand}"
+                            Padding="20,8" />
+                </Grid>
+            </StackPanel>
+        </Border>
+    </Grid>
+
+</UserControl>

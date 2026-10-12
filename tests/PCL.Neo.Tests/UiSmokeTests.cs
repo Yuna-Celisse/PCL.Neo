@@ -41,11 +41,13 @@ public class UiSmokeTests(AvaloniaAppFixture fx)
     }
 
     [Fact]
-    public void ViewLocator_Resolves_Home_And_About()
+    public void ViewLocator_Resolves_All_Pages()
     {
         // ViewLocator 找不到视图时会退化成 "Not Found: ..." 的 TextBlock
         Assert.IsType<HomeView>(fx.HomeView);
         Assert.IsType<AboutView>(fx.AboutView);
+        Assert.IsType<DownloadView>(fx.DownloadView);
+        Assert.IsType<InstancesView>(fx.InstancesView);
     }
 
     [Fact]

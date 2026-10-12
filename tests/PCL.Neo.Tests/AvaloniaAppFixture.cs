@@ -33,6 +33,8 @@ public sealed class AvaloniaAppFixture : IDisposable
     public ThemeVariant ActualVariantInDark { get; }
     public object? HomeView { get; }
     public object? AboutView { get; }
+    public object? DownloadView { get; }
+    public object? InstancesView { get; }
     public Size DesiredSize { get; }
     public bool WindowVisible { get; }
 
@@ -51,6 +53,8 @@ public sealed class AvaloniaAppFixture : IDisposable
         var locator = new ViewLocator();
         HomeView = locator.Build(new ViewModels.HomeViewModel());
         AboutView = locator.Build(new ViewModels.AboutViewModel());
+        DownloadView = locator.Build(new ViewModels.DownloadViewModel());
+        InstancesView = locator.Build(new ViewModels.InstancesViewModel());
 
         _window = new Views.MainWindow { DataContext = new ViewModels.MainWindowViewModel() };
         _window.Show();

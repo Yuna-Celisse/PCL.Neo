@@ -8,19 +8,17 @@
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
         Title="PCL.Neo"
-        Width="900" Height="580" MinWidth="720" MinHeight="460">
+        Width="920" Height="620" MinWidth="750" MinHeight="500">
 
     <Design.DataContext>
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <!--
-      M0 首页壳：导航先借用 FluentTheme 的左侧 TabControl。
-      自绘导航条属于 PCL.Neo.UI 的后续控件工作，届时替换本节点即可，页面本身不受影响。
-      页面以 ViewModel 形式提供，由 App.axaml 中注册的 ViewLocator 解析成对应 View。
-    -->
+    <!-- 侧边导航栏 -->
     <TabControl TabStripPlacement="Left" Margin="12" BorderThickness="0">
         <TabItem Header="主页" Content="{Binding Home}" />
+        <TabItem Header="版本下载" Content="{Binding Download}" />
+        <TabItem Header="实例管理" Content="{Binding Instances}" />
         <TabItem Header="关于" Content="{Binding About}" />
     </TabControl>
 
