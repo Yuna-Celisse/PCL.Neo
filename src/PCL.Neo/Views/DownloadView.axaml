@@ -8,91 +8,105 @@
              x:Class="PCL.Neo.Views.DownloadView"
              x:DataType="vm:DownloadViewModel">
 
-    <!-- 1:1 PCL 双栏下载器布局 -->
-    <Grid ColumnDefinitions="300,*">
-        <!-- 左侧筛选控制 (PanLeft) -->
+    <!-- 1:1 复制 PCL PageDownloadLeft + PageDownloadRight 架构 -->
+    <Grid ColumnDefinitions="260,*">
+        <!-- 左侧 PageDownloadLeft 分类抽屉列表 (1:1 还原 15 项真实分类) -->
         <Border Grid.Column="0" Background="{DynamicResource NeoColorGray7Brush}"
-                Padding="20,18,18,18">
-            <Grid RowDefinitions="Auto,*,Auto">
-                <StackPanel Grid.Row="0" Spacing="14">
-                    <TextBlock Text="下载源与过滤" FontWeight="SemiBold" FontSize="13" Opacity="0.75" />
+                Padding="10,12,8,12">
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+                <StackPanel Spacing="2">
+                    <!-- 核心安装 -->
+                    <ctrl:NeoListItem Title="自动安装" IconText="📦" IsChecked="True" />
 
-                    <ctrl:NeoCard Padding="12,10">
-                        <StackPanel Spacing="10">
-                            <Button Classes="accent" Command="{Binding RefreshManifestCommand}"
-                                    IsEnabled="{Binding !IsLoadingManifest}"
-                                    HorizontalAlignment="Stretch">
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="6">
-                                    <TextBlock Text="⟳" FontWeight="Bold" />
-                                    <TextBlock Text="同步官方版本列表" FontWeight="SemiBold" />
-                                </StackPanel>
-                            </Button>
+                    <!-- 社区资源 -->
+                    <TextBlock Text="社区资源" Margin="12,12,6,4" Opacity="0.5" FontSize="11.5" FontWeight="SemiBold" />
+                    <ctrl:NeoListItem Title="Mod 模组" IconText="🧩" Subtitle="Modrinth / CurseForge" />
+                    <ctrl:NeoListItem Title="整合包" IconText="📁" Subtitle="一键配置包" />
+                    <ctrl:NeoListItem Title="数据包" IconText="📜" />
+                    <ctrl:NeoListItem Title="材质包" IconText="🎨" />
+                    <ctrl:NeoListItem Title="光影包" IconText="✨" />
+                    <ctrl:NeoListItem Title="世界地图" IconText="🌍" />
+                    <ctrl:NeoListItem Title="我的收藏" IconText="⭐" />
 
-                            <CheckBox Content="包含开发版快照 (Snapshots)" IsChecked="{Binding IncludeSnapshots}" />
-                        </StackPanel>
-                    </ctrl:NeoCard>
+                    <!-- 加载器独立安装 -->
+                    <TextBlock Text="单独下载安装" Margin="12,12,6,4" Opacity="0.5" FontSize="11.5" FontWeight="SemiBold" />
+                    <ctrl:NeoListItem Title="Minecraft 原版" IconText="🧊" />
+                    <ctrl:NeoListItem Title="OptiFine" IconText="⚡" />
+                    <ctrl:NeoListItem Title="Forge" IconText="🔨" />
+                    <ctrl:NeoListItem Title="NeoForge" IconText="🔶" />
+                    <ctrl:NeoListItem Title="Fabric" IconText="🧵" />
+                    <ctrl:NeoListItem Title="Legacy Fabric" IconText="🧵" />
+                    <ctrl:NeoListItem Title="Cleanroom" IconText="🧹" />
                 </StackPanel>
+            </ScrollViewer>
+        </Border>
 
-                <!-- 底部操作与进度条 -->
-                <StackPanel Grid.Row="2" Spacing="10" Margin="0,0,0,6">
-                    <ProgressBar Height="4" Minimum="0" Maximum="100"
+        <!-- 右侧 PageDownloadRight 内容视区 -->
+        <Grid Grid.Column="1" RowDefinitions="Auto,*,Auto" Margin="20,16">
+            <!-- 顶部过滤器与刷新栏 -->
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+                <StackPanel Grid.Column="0" Spacing="4">
+                    <TextBlock Text="官方版本下载" FontWeight="Bold" FontSize="16" />
+                    <TextBlock Text="从 Mojang 官方元数据端点同步原版版本清单" FontSize="12" Opacity="0.6" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                    <CheckBox Content="显示快照版" IsChecked="{Binding IncludeSnapshots}" />
+                    <Button Classes="accent" Content="⟳ 同步清单" Command="{Binding RefreshManifestCommand}"
+                            IsEnabled="{Binding !IsLoadingManifest}" Padding="10,5" />
+                </StackPanel>
+            </Grid>
+
+            <!-- 中间版本卡片列表 -->
+            <ListBox Grid.Row="1" ItemsSource="{Binding Versions}"
+                     SelectedItem="{Binding SelectedVersion}"
+                     Background="Transparent">
+                <ListBox.Styles>
+                    <Style Selector="ListBoxItem">
+                        <Setter Property="Padding" Value="0" />
+                        <Setter Property="Margin" Value="0,0,0,6" />
+                    </Style>
+                    <Style Selector="ListBoxItem /template/ ContentPresenter">
+                        <Setter Property="Background" Value="Transparent" />
+                    </Style>
+                </ListBox.Styles>
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:VersionItemViewModel">
+                        <ctrl:NeoCard Padding="14,10">
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <Border Grid.Column="0" Width="32" Height="32"
+                                        Background="{DynamicResource NeoSystemAccentColorLight3Brush}"
+                                        CornerRadius="6" Margin="0,0,12,0" VerticalAlignment="Center">
+                                    <TextBlock Text="🧊" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                    <TextBlock Text="{Binding Id}" FontWeight="Bold" FontSize="14" />
+                                    <TextBlock Text="{Binding Type}" FontSize="11" Opacity="0.6" />
+                                </StackPanel>
+                                <TextBlock Grid.Column="2" Text="{Binding ReleaseTime}" Opacity="0.5" FontSize="11.5" VerticalAlignment="Center" />
+                            </Grid>
+                        </ctrl:NeoCard>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <!-- 底部操作与安装状态 -->
+            <Border Grid.Row="2" Background="{DynamicResource NeoColorGray7Brush}"
+                    CornerRadius="8" Padding="14,10" Margin="0,10,0,0">
+                <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                    <ProgressBar Grid.Row="0" Grid.ColumnSpan="2" Height="4" Margin="0,0,0,8"
+                                 Minimum="0" Maximum="100"
                                  Value="{Binding DownloadProgressValue}"
                                  IsIndeterminate="{Binding IsProgressIndeterminate}" />
 
-                    <TextBlock Text="{Binding StatusMessage}" FontSize="11.5" Opacity="0.75"
-                               HorizontalAlignment="Center" TextWrapping="Wrap" />
-
-                    <Button Classes="launch" Command="{Binding InstallSelectedVersionCommand}"
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding StatusMessage}"
+                               VerticalAlignment="Center" FontSize="12" Opacity="0.8" TextWrapping="Wrap" />
+                    <Button Grid.Row="1" Grid.Column="1" Classes="launch" Content="开始安装"
+                            Command="{Binding InstallSelectedVersionCommand}"
                             IsEnabled="{Binding !IsDownloading}"
-                            HorizontalAlignment="Stretch">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
-                            <TextBlock Text="⬇" FontWeight="Black" FontSize="16" Foreground="White" VerticalAlignment="Center" />
-                            <TextBlock Text="安装选定版本" FontWeight="Black" FontSize="16" Foreground="White"
-                                       VerticalAlignment="Center" />
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
-            </Grid>
-        </Border>
-
-        <!-- 右侧卡片式列表 (PanRight) -->
-        <ScrollViewer Grid.Column="1" Margin="20,18">
-            <StackPanel Spacing="12" MaxWidth="580" HorizontalAlignment="Left">
-                <TextBlock Text="可供下载安装的 Minecraft 官方版本" FontWeight="Bold" FontSize="15" Margin="0,0,0,4" />
-
-                <ListBox ItemsSource="{Binding Versions}"
-                         SelectedItem="{Binding SelectedVersion}"
-                         Background="Transparent">
-                    <ListBox.Styles>
-                        <Style Selector="ListBoxItem">
-                            <Setter Property="Padding" Value="0" />
-                            <Setter Property="Margin" Value="0,0,0,8" />
-                        </Style>
-                        <Style Selector="ListBoxItem /template/ ContentPresenter">
-                            <Setter Property="Background" Value="Transparent" />
-                        </Style>
-                    </ListBox.Styles>
-                    <ListBox.ItemTemplate>
-                        <DataTemplate x:DataType="vm:VersionItemViewModel">
-                            <ctrl:NeoCard Padding="12,10">
-                                <Grid ColumnDefinitions="Auto,*,Auto">
-                                    <Border Grid.Column="0" Width="32" Height="32"
-                                            Background="{DynamicResource NeoSystemAccentColorLight3Brush}"
-                                            CornerRadius="4" Margin="0,0,10,0" VerticalAlignment="Center">
-                                        <TextBlock Text="📦" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                    </Border>
-                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
-                                        <TextBlock Text="{Binding Id}" FontWeight="Bold" FontSize="13.5" />
-                                        <TextBlock Text="{Binding Type}" FontSize="11" Opacity="0.6" />
-                                    </StackPanel>
-                                    <TextBlock Grid.Column="2" Text="{Binding ReleaseTime}" Opacity="0.5" FontSize="11.5" VerticalAlignment="Center" />
-                                </Grid>
-                            </ctrl:NeoCard>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </StackPanel>
-        </ScrollViewer>
+                            Height="38" Padding="20,0" />
+                </Grid>
+            </Border>
+        </Grid>
     </Grid>
 
 </UserControl>

@@ -1,0 +1,86 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:ctrl="using:PCL.Neo.UI.Controls">
+
+    <Design.PreviewWith>
+        <Border Padding="20" Background="#f0f0f0" Width="300">
+            <StackPanel Spacing="4">
+                <ctrl:NeoListItem Title="自动安装" IconText="📦" IsChecked="True" />
+                <ctrl:NeoListItem Title="Mod 模组" IconText="🧩" Subtitle="浏览并下载热门模组" />
+                <ctrl:NeoListItem Title="整合包" IconText="📁" />
+            </StackPanel>
+        </Border>
+    </Design.PreviewWith>
+
+    <ControlTheme x:Key="{x:Type ctrl:NeoListItem}" TargetType="ctrl:NeoListItem">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Height" Value="40" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="10,0" />
+        <Setter Property="Transitions">
+            <Transitions>
+                <BrushTransition Duration="0:0:0.12" Property="Background" />
+                <TransformOperationsTransition Duration="0:0:0.12" Property="RenderTransform" />
+            </Transitions>
+        </Setter>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Name="PART_RootBorder"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}">
+                    <Grid ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
+                        <!-- 1. 左侧图标/徽章 -->
+                        <Border Grid.Column="0" Width="26" Height="26"
+                                Margin="0,0,10,0" VerticalAlignment="Center"
+                                CornerRadius="4"
+                                IsVisible="{TemplateBinding IconText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                            <TextBlock Text="{TemplateBinding IconText}"
+                                       FontSize="15"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+
+                        <!-- 2. 中间主副标题 -->
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
+                            <TextBlock Text="{TemplateBinding Title}"
+                                       FontWeight="SemiBold"
+                                       FontSize="13.5"
+                                       Foreground="{DynamicResource NeoColorGray1Brush}"
+                                       TextTrimming="CharacterEllipsis" />
+                            <TextBlock Text="{TemplateBinding Subtitle}"
+                                       FontSize="11"
+                                       Opacity="0.55"
+                                       IsVisible="{TemplateBinding Subtitle, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                       TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+
+                        <!-- 3. 右侧状态指示器 (PCL 选中箭头或指示条) -->
+                        <Border Grid.Column="2" Name="PART_Indicator"
+                                Width="3" Height="16"
+                                CornerRadius="1.5"
+                                Background="{DynamicResource NeoSystemAccentColorBrush}"
+                                IsVisible="{TemplateBinding IsChecked}"
+                                VerticalAlignment="Center" />
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+
+        <!-- 悬浮态：PCL 经典微白半透明半抬升反馈 -->
+        <Style Selector="^:pointerover">
+            <Setter Property="Background" Value="#12000000" />
+        </Style>
+
+        <!-- 点击态 -->
+        <Style Selector="^:pressed">
+            <Setter Property="RenderTransform" Value="scale(0.985)" />
+        </Style>
+
+        <!-- 选中态：底色加深并点亮指示器 -->
+        <Style Selector="^[IsChecked=True]">
+            <Setter Property="Background" Value="#1E000000" />
+        </Style>
+    </ControlTheme>
+
+</ResourceDictionary>
