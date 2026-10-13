@@ -14,21 +14,37 @@
                 BorderBrush="{DynamicResource NeoColorGray6Brush}" BorderThickness="0,0,1,0"
                 Padding="24,20">
             <Grid RowDefinitions="Auto,*,Auto" VerticalAlignment="Stretch">
-                <!-- 顶部：玩家身份卡片 -->
-                <StackPanel Grid.Row="0" Spacing="14">
-                    <TextBlock Text="玩家离线身份" FontWeight="SemiBold" FontSize="13" Opacity="0.75" />
+                <!-- 顶部：玩家身份与登录卡片 -->
+                <StackPanel Grid.Row="0" Spacing="12">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Grid.Column="0" Text="{Binding AccountType, StringFormat='账户体系：{0}'}" FontWeight="SemiBold" FontSize="13" Opacity="0.75" VerticalAlignment="Center" />
+                        <Button Grid.Column="1" Content="微软登录" Command="{Binding StartMicrosoftLoginCommand}"
+                                IsEnabled="{Binding !IsDeviceCodePending}" Padding="8,4" FontSize="11" />
+                    </Grid>
+
                     <Border Background="{DynamicResource NeoColorGray8Brush}" CornerRadius="8" Padding="12"
                             BorderBrush="{DynamicResource NeoColorGray5Brush}" BorderThickness="1">
-                        <Grid ColumnDefinitions="Auto,*">
-                            <!-- 简易玩家头像占位 -->
-                            <Border Grid.Column="0" Width="38" Height="38" Background="{DynamicResource NeoSystemAccentColorLight3Brush}"
-                                    CornerRadius="6" Margin="0,0,12,0">
-                                <TextBlock Text="S" FontWeight="Bold" Foreground="White" FontSize="18"
-                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <StackPanel Spacing="8">
+                            <Grid ColumnDefinitions="Auto,*">
+                                <Border Grid.Column="0" Width="38" Height="38" Background="{DynamicResource NeoSystemAccentColorLight3Brush}"
+                                        CornerRadius="6" Margin="0,0,12,0">
+                                    <TextBlock Text="S" FontWeight="Bold" Foreground="White" FontSize="18"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                                <TextBox Grid.Column="1" Text="{Binding PlayerName}" Watermark="输入游戏昵称"
+                                         VerticalAlignment="Center" />
+                            </Grid>
+
+                            <!-- 设备登录配对码提示框 (仅在拉取代码后出现) -->
+                            <Border IsVisible="{Binding IsDeviceCodePending}" Background="{DynamicResource NeoSystemAccentColorLight5Brush}"
+                                    CornerRadius="6" Padding="10,8">
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="请在浏览器输入以下配对码完成授权：" FontSize="11" Opacity="0.85" />
+                                    <SelectableTextBlock Text="{Binding DeviceLoginCode}" FontSize="18" FontWeight="Black"
+                                                         Foreground="{DynamicResource NeoSystemAccentColorDark3Brush}" HorizontalAlignment="Center" />
+                                </StackPanel>
                             </Border>
-                            <TextBox Grid.Column="1" Text="{Binding PlayerName}" Watermark="输入游戏昵称"
-                                     VerticalAlignment="Center" />
-                        </Grid>
+                        </StackPanel>
                     </Border>
                 </StackPanel>
 

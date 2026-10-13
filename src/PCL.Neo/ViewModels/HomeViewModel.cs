@@ -21,6 +21,56 @@ public partial class HomeViewModel : ViewModelBase
     private string _playerName = "Player";
 
     [ObservableProperty]
+    private string _accountType = "离线";
+
+    [ObservableProperty]
+    private string? _deviceLoginCode;
+
+    [ObservableProperty]
+    private string? _deviceLoginUrl;
+
+    [ObservableProperty]
+    private bool _isDeviceCodePending;
+
+    [RelayCommand]
+    private async Task StartMicrosoftLoginAsync()
+    {
+        if (IsDeviceCodePending) return;
+
+        IsDeviceCodePending = true;
+        LaunchStatusMessage = "正在请求微软设备代码...";
+
+        try
+        {
+            var res = await _service.MicrosoftAuth.RequestDeviceCodeAsync();
+            DeviceLoginCode = res.UserCode;
+            DeviceLoginUrl = res.VerificationUri;
+            LaunchStatusMessage = $"请在浏览器打开 {res.VerificationUri} 并输入配对码: {res.UserCode}";
+
+            // 尝试直接调系统浏览器打开
+            try { PCL.Neo.Core.Platform.ShellOps.OpenWebLink(res.VerificationUri); } catch { }
+
+            var account = await _service.MicrosoftAuth.PollForAccountAsync(
+                res.DeviceCode,
+                res.Interval,
+                statusProgress: new Progress<string>(msg => LaunchStatusMessage = msg));
+
+            PlayerName = account.Username;
+            AccountType = "微软正版";
+            LaunchStatusMessage = $"登录成功：欢迎 {account.Username}！";
+        }
+        catch (Exception ex)
+        {
+            LaunchStatusMessage = $"登录失败: {ex.Message}";
+        }
+        finally
+        {
+            IsDeviceCodePending = false;
+            DeviceLoginCode = null;
+        }
+    }
+
+    [ObservableProperty]
     private LocalInstance? _selectedInstance;
 
     [ObservableProperty]

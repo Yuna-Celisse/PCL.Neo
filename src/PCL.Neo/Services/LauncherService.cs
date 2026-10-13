@@ -29,6 +29,7 @@ public sealed class LauncherService
     public GameInstaller Installer { get; }
     public GameLauncher Launcher { get; }
     public InstanceManager Instances { get; }
+    public PCL.Neo.Core.Minecraft.Auth.MicrosoftAuthClient MicrosoftAuth { get; }
 
     private LauncherService()
     {
@@ -39,8 +40,15 @@ public sealed class LauncherService
         {
             MaxParallelism = 12
         });
+        // 默认注入 BMCLAPI 规则进行全球/国内链路自适应加速
+        var mirrorDownloader = new FileDownloader(HttpClient, new DownloadOptions
+        {
+            MaxParallelism = 12,
+            Mirrors = PCL.Neo.Core.IO.Downloads.MirrorSources.CreateBmclapiRules()
+        });
         VersionClient = new MojangVersionClient(HttpClient);
-        Installer = new GameInstaller(VersionClient, Downloader, Layout);
+        Installer = new GameInstaller(VersionClient, mirrorDownloader, Layout);
+        MicrosoftAuth = new PCL.Neo.Core.Minecraft.Auth.MicrosoftAuthClient(HttpClient);
         Launcher = new GameLauncher(ProcessRunner, Layout);
         Instances = new InstanceManager(Layout);
     }
