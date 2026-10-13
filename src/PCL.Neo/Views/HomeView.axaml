@@ -1,56 +1,61 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:PCL.Neo.ViewModels"
+             xmlns:ctrl="using:PCL.Neo.UI.Controls"
              xmlns:inst="using:PCL.Neo.Core.Minecraft.Instances"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="880" d:DesignHeight="500"
+             mc:Ignorable="d" d:DesignWidth="880" d:DesignHeight="480"
              x:Class="PCL.Neo.Views.HomeView"
              x:DataType="vm:HomeViewModel">
 
-    <Grid ColumnDefinitions="310,*">
-        <!-- 左侧控制面板 (Left Panel) -->
+    <!-- 1:1 复制 PCL PageLaunchLeft (300px) + PageLaunchRight 双栏结构 -->
+    <Grid ColumnDefinitions="300,*">
+        <!-- 左侧 PanLeft (PageLaunchLeft 1:1 移植) -->
         <Border Grid.Column="0" Background="{DynamicResource NeoColorGray7Brush}"
-                BorderBrush="{DynamicResource NeoColorGray6Brush}" BorderThickness="0,0,1,0"
-                Padding="24,20">
+                Padding="20,18,18,18">
             <Grid RowDefinitions="Auto,*,Auto" VerticalAlignment="Stretch">
-                <!-- 顶部：玩家身份与登录卡片 -->
-                <StackPanel Grid.Row="0" Spacing="12">
+                <!-- 顶部：玩家身份 -->
+                <StackPanel Grid.Row="0" Spacing="8">
                     <Grid ColumnDefinitions="*,Auto">
-                        <TextBlock Grid.Column="0" Text="{Binding AccountType, StringFormat='账户体系：{0}'}" FontWeight="SemiBold" FontSize="13" Opacity="0.75" VerticalAlignment="Center" />
-                        <Button Grid.Column="1" Content="微软登录" Command="{Binding StartMicrosoftLoginCommand}"
-                                IsEnabled="{Binding !IsDeviceCodePending}" Padding="8,4" FontSize="11" />
+                        <TextBlock Grid.Column="0" Text="{Binding AccountType, StringFormat='登录方式：{0}'}"
+                                   FontWeight="SemiBold" FontSize="12" Opacity="0.7" VerticalAlignment="Center" />
+                        <Button Grid.Column="1" Classes="accent" Content="微软登录"
+                                Command="{Binding StartMicrosoftLoginCommand}"
+                                IsEnabled="{Binding !IsDeviceCodePending}"
+                                Padding="8,3" FontSize="11" />
                     </Grid>
 
-                    <Border Background="{DynamicResource NeoColorGray8Brush}" CornerRadius="8" Padding="12"
-                            BorderBrush="{DynamicResource NeoColorGray5Brush}" BorderThickness="1">
-                        <StackPanel Spacing="8">
+                    <ctrl:NeoCard Padding="12,10">
+                        <StackPanel Spacing="6">
                             <Grid ColumnDefinitions="Auto,*">
-                                <Border Grid.Column="0" Width="38" Height="38" Background="{DynamicResource NeoSystemAccentColorLight3Brush}"
-                                        CornerRadius="6" Margin="0,0,12,0">
+                                <Border Grid.Column="0" Width="36" Height="36"
+                                        Background="{DynamicResource NeoSystemAccentColorLight3Brush}"
+                                        CornerRadius="4" Margin="0,0,10,0">
                                     <TextBlock Text="S" FontWeight="Bold" Foreground="White" FontSize="18"
                                                HorizontalAlignment="Center" VerticalAlignment="Center" />
                                 </Border>
-                                <TextBox Grid.Column="1" Text="{Binding PlayerName}" Watermark="输入游戏昵称"
-                                         VerticalAlignment="Center" />
+                                <TextBox Grid.Column="1" Text="{Binding PlayerName}" Watermark="游戏名"
+                                         VerticalAlignment="Center" Height="32" FontSize="13" />
                             </Grid>
 
-                            <!-- 设备登录配对码提示框 (仅在拉取代码后出现) -->
-                            <Border IsVisible="{Binding IsDeviceCodePending}" Background="{DynamicResource NeoSystemAccentColorLight5Brush}"
-                                    CornerRadius="6" Padding="10,8">
-                                <StackPanel Spacing="4">
-                                    <TextBlock Text="请在浏览器输入以下配对码完成授权：" FontSize="11" Opacity="0.85" />
-                                    <SelectableTextBlock Text="{Binding DeviceLoginCode}" FontSize="18" FontWeight="Black"
-                                                         Foreground="{DynamicResource NeoSystemAccentColorDark3Brush}" HorizontalAlignment="Center" />
+                            <Border IsVisible="{Binding IsDeviceCodePending}"
+                                    Background="{DynamicResource NeoSystemAccentColorLight5Brush}"
+                                    CornerRadius="4" Padding="8,6">
+                                <StackPanel Spacing="2">
+                                    <TextBlock Text="请在浏览器输入授权码：" FontSize="11" Opacity="0.85" />
+                                    <SelectableTextBlock Text="{Binding DeviceLoginCode}" FontSize="16" FontWeight="Black"
+                                                         Foreground="{DynamicResource NeoSystemAccentColorDark3Brush}"
+                                                         HorizontalAlignment="Center" />
                                 </StackPanel>
                             </Border>
                         </StackPanel>
-                    </Border>
+                    </ctrl:NeoCard>
                 </StackPanel>
 
-                <!-- 中间：Java 运行时选择 -->
-                <StackPanel Grid.Row="1" Spacing="8" Margin="0,20,0,0">
-                    <TextBlock Text="Java 运行时" FontWeight="SemiBold" FontSize="13" Opacity="0.75" />
+                <!-- 中间：Java 与环境选择 -->
+                <StackPanel Grid.Row="1" Spacing="6" Margin="0,16,0,0">
+                    <TextBlock Text="Java 运行环境" FontWeight="SemiBold" FontSize="12" Opacity="0.7" />
                     <ComboBox ItemsSource="{Binding JavaList}"
                               SelectedItem="{Binding SelectedJavaPath}"
                               HorizontalAlignment="Stretch">
@@ -62,18 +67,17 @@
                     </ComboBox>
                 </StackPanel>
 
-                <!-- 底部：PCL 经典巨型启动按钮 -->
-                <StackPanel Grid.Row="2" Spacing="10" Margin="0,0,0,8">
-                    <TextBlock Text="{Binding LaunchStatusMessage}" FontSize="12" Opacity="0.75"
+                <!-- 底部：BtnLaunch 经典巨型启动按钮 + 版本切换入口 -->
+                <StackPanel Grid.Row="2" Spacing="10" Margin="0,0,0,6">
+                    <TextBlock Text="{Binding LaunchStatusMessage}" FontSize="11.5" Opacity="0.75"
                                HorizontalAlignment="Center" TextWrapping="Wrap" />
 
-                    <!-- 标志性的巨大启动胶囊按钮 -->
-                    <Button Classes="PclLaunch" Command="{Binding LaunchGameCommand}"
+                    <!-- 1:1 还原 PCL 经典的 BtnLaunch -->
+                    <Button Classes="launch" Command="{Binding LaunchGameCommand}"
                             IsEnabled="{Binding !IsLaunching}"
-                            HorizontalAlignment="Stretch" Height="52">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
-                            <!-- 播放三角图标 -->
-                            <Path Data="M 0,0 L 0,16 L 14,8 Z" Fill="White" VerticalAlignment="Center" />
+                            HorizontalAlignment="Stretch">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+                            <Path Data="M 0,0 L 0,14 L 12,7 Z" Fill="White" VerticalAlignment="Center" />
                             <TextBlock Text="启动游戏" FontWeight="Black" FontSize="18" Foreground="White"
                                        VerticalAlignment="Center" />
                         </StackPanel>
@@ -82,31 +86,18 @@
             </Grid>
         </Border>
 
-        <!-- 右侧内容面板 (Right Panel) - 版本卡片与信息流 -->
-        <ScrollViewer Grid.Column="1" Margin="24,20">
-            <StackPanel Spacing="16" MaxWidth="620" HorizontalAlignment="Left">
-                <!-- 提示卡片 -->
-                <Border Background="{DynamicResource NeoColorGray8Brush}" CornerRadius="10" Padding="18,14"
-                        BorderBrush="{DynamicResource NeoColorGray6Brush}" BorderThickness="1">
-                    <Grid ColumnDefinitions="Auto,*">
-                        <TextBlock Grid.Column="0" Text="📢" FontSize="18" Margin="0,0,12,0" VerticalAlignment="Top" />
-                        <StackPanel Grid.Column="1" Spacing="4">
-                            <TextBlock Text="欢迎使用 PCL.Neo 跨平台重构版" FontWeight="Bold" FontSize="14" />
-                            <TextBlock Text="原生 Avalonia 自绘驱动，纯正 .NET 10 强力运行，已适配 Linux / macOS / Windows。"
-                                       Opacity="0.75" FontSize="12" TextWrapping="Wrap" />
-                        </StackPanel>
-                    </Grid>
-                </Border>
+        <!-- 右侧 PanRight (PageLaunchRight 1:1 卡片信息流) -->
+        <ScrollViewer Grid.Column="1" Margin="20,18">
+            <StackPanel Spacing="14" MaxWidth="580" HorizontalAlignment="Left">
+                <!-- 1. 社区公告卡片 (MyCard 还原) -->
+                <ctrl:NeoCard Title="社区公告">
+                    <TextBlock Text="欢迎体验 PCL 跨平台原生重构版！基于 Avalonia 12 与 .NET 10，带来与原版几乎一致的像素级质感和极致流畅的跨平台性能。"
+                               TextWrapping="Wrap" FontSize="12.5" Opacity="0.8" LineHeight="20" />
+                </ctrl:NeoCard>
 
-                <!-- 当前选中的版本大卡片 -->
-                <Border Background="{DynamicResource NeoColorGray8Brush}" CornerRadius="10" Padding="20"
-                        BorderBrush="{DynamicResource NeoSystemAccentColorStrokeBrush}" BorderThickness="1">
+                <!-- 2. 版本选择与管理大卡片 (MyCard 还原) -->
+                <ctrl:NeoCard Title="当前选中的 Minecraft 实例">
                     <StackPanel Spacing="12">
-                        <Grid ColumnDefinitions="*,Auto">
-                            <TextBlock Grid.Column="0" Text="当前选中的游戏版本" FontWeight="SemiBold" FontSize="14" Opacity="0.8" />
-                            <Button Grid.Column="1" Content="刷新版本" Command="{Binding RefreshDataCommand}" Padding="8,3" FontSize="12" />
-                        </Grid>
-
                         <ComboBox ItemsSource="{Binding Instances}"
                                   SelectedItem="{Binding SelectedInstance}"
                                   HorizontalAlignment="Stretch">
@@ -114,44 +105,25 @@
                                 <DataTemplate x:DataType="inst:LocalInstance">
                                     <StackPanel Spacing="2" Margin="2,4">
                                         <TextBlock Text="{Binding Id}" FontWeight="Bold" FontSize="14" />
-                                        <TextBlock Text="{Binding DirectoryPath}" Opacity="0.6" FontSize="11" />
+                                        <TextBlock Text="{Binding DirectoryPath}" Opacity="0.55" FontSize="11" />
                                     </StackPanel>
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
-                    </StackPanel>
-                </Border>
 
-                <!-- 社区与开源指引卡片 -->
-                <Border Background="{DynamicResource NeoColorGray8Brush}" CornerRadius="10" Padding="18"
-                        BorderBrush="{DynamicResource NeoColorGray6Brush}" BorderThickness="1">
-                    <StackPanel Spacing="8">
-                        <TextBlock Text="关于重构" FontWeight="Bold" FontSize="14" />
-                        <TextBlock Text="本项目依照《PCL 存储库合理使用指南》对 PCL 进行非商业性独立二次开发，核心库与 UI 完全解耦，实现 Linux 和其他架构平台的原生支持。"
-                                   Opacity="0.75" FontSize="12" TextWrapping="Wrap" />
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                            <Button Content="刷新列表" Command="{Binding RefreshDataCommand}" Padding="10,4" FontSize="12" />
+                        </StackPanel>
                     </StackPanel>
-                </Border>
+                </ctrl:NeoCard>
+
+                <!-- 3. 开发指引与协议遵循卡片 -->
+                <ctrl:NeoCard Title="PCL 存储库合理使用声明">
+                    <TextBlock Text="本项目依照《PCL 存储库合理使用指南》对 PCL 进行非商业性独立二次开发，遵循 Apache-2.0 与协议指引，首位致敬并署名原作者龙腾猫跃。"
+                               TextWrapping="Wrap" FontSize="12" Opacity="0.75" LineHeight="18" />
+                </ctrl:NeoCard>
             </StackPanel>
         </ScrollViewer>
     </Grid>
-
-    <UserControl.Styles>
-        <Style Selector="Button.PclLaunch">
-            <Setter Property="Background" Value="{DynamicResource NeoSystemAccentColorBrush}" />
-            <Setter Property="CornerRadius" Value="12" />
-            <Setter Property="Transitions">
-                <Transitions>
-                    <BrushTransition Duration="0:0:0.15" Property="Background" />
-                    <TransformOperationsTransition Duration="0:0:0.15" Property="RenderTransform" />
-                </Transitions>
-            </Setter>
-        </Style>
-        <Style Selector="Button.PclLaunch:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource NeoSystemAccentColorLight2Brush}" />
-        </Style>
-        <Style Selector="Button.PclLaunch:pressed">
-            <Setter Property="RenderTransform" Value="scale(0.97)" />
-        </Style>
-    </UserControl.Styles>
 
 </UserControl>

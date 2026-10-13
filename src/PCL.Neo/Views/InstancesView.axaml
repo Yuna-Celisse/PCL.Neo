@@ -1,61 +1,63 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:PCL.Neo.ViewModels"
+             xmlns:ctrl="using:PCL.Neo.UI.Controls"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" d:DesignWidth="880" d:DesignHeight="500"
+             mc:Ignorable="d" d:DesignWidth="880" d:DesignHeight="480"
              x:Class="PCL.Neo.Views.InstancesView"
              x:DataType="vm:InstancesViewModel">
 
-    <Grid ColumnDefinitions="310,*">
-        <!-- 左侧参数设置面板 -->
+    <!-- 1:1 PCL 双栏设置/实例管理布局 -->
+    <Grid ColumnDefinitions="300,*">
+        <!-- 左侧参数与控制 (PanLeft) -->
         <Border Grid.Column="0" Background="{DynamicResource NeoColorGray7Brush}"
-                BorderBrush="{DynamicResource NeoColorGray6Brush}" BorderThickness="0,0,1,0"
-                Padding="24,20">
+                Padding="20,18,18,18">
             <Grid RowDefinitions="Auto,*,Auto">
-                <StackPanel Grid.Row="0" Spacing="16">
-                    <TextBlock Text="全局启动设置" FontWeight="Bold" FontSize="14" Opacity="0.8" />
+                <StackPanel Grid.Row="0" Spacing="12">
+                    <TextBlock Text="全局启动配置" FontWeight="SemiBold" FontSize="13" Opacity="0.75" />
 
-                    <!-- 玩家名 -->
-                    <StackPanel Spacing="6">
-                        <TextBlock Text="玩家游戏名" FontSize="12" Opacity="0.75" />
-                        <TextBox Text="{Binding PlayerName}" Watermark="输入游戏昵称" />
-                    </StackPanel>
+                    <ctrl:NeoCard Padding="12,10">
+                        <StackPanel Spacing="10">
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="离线游戏名" FontSize="11.5" Opacity="0.75" />
+                                <TextBox Text="{Binding PlayerName}" Watermark="昵称" Height="30" FontSize="12.5" />
+                            </StackPanel>
 
-                    <!-- 最大内存 -->
-                    <StackPanel Spacing="6">
-                        <TextBlock Text="最大内存限制 (MB)" FontSize="12" Opacity="0.75" />
-                        <TextBox Text="{Binding MaxMemoryMb}" />
-                    </StackPanel>
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="最大内存上限 (MB)" FontSize="11.5" Opacity="0.75" />
+                                <TextBox Text="{Binding MaxMemoryMb}" Height="30" FontSize="12.5" />
+                            </StackPanel>
 
-                    <!-- Java 运行时选择 -->
-                    <StackPanel Spacing="6">
-                        <Grid ColumnDefinitions="*,Auto">
-                            <TextBlock Grid.Column="0" Text="Java 运行时" FontSize="12" Opacity="0.75" VerticalAlignment="Center" />
-                            <Button Grid.Column="1" Content="⟳" Command="{Binding RefreshJavaListCommand}" Padding="6,2" FontSize="11" />
-                        </Grid>
-                        <ComboBox ItemsSource="{Binding JavaPaths}"
-                                  SelectedItem="{Binding SelectedJavaPath}"
-                                  HorizontalAlignment="Stretch">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding}" FontSize="12" TextTrimming="CharacterEllipsis" />
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                    </StackPanel>
+                            <StackPanel Spacing="4">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Grid.Column="0" Text="Java 运行环境" FontSize="11.5" Opacity="0.75" VerticalAlignment="Center" />
+                                    <Button Grid.Column="1" Content="⟳" Command="{Binding RefreshJavaListCommand}" Padding="6,1" FontSize="10" />
+                                </Grid>
+                                <ComboBox ItemsSource="{Binding JavaPaths}"
+                                          SelectedItem="{Binding SelectedJavaPath}"
+                                          HorizontalAlignment="Stretch">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" FontSize="11.5" TextTrimming="CharacterEllipsis" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </StackPanel>
+                        </StackPanel>
+                    </ctrl:NeoCard>
                 </StackPanel>
 
-                <!-- 底部操作按钮 -->
-                <StackPanel Grid.Row="2" Spacing="10" Margin="0,0,0,8">
-                    <TextBlock Text="{Binding StatusMessage}" FontSize="12" Opacity="0.75"
+                <!-- 底部启动按钮 -->
+                <StackPanel Grid.Row="2" Spacing="10" Margin="0,0,0,6">
+                    <TextBlock Text="{Binding StatusMessage}" FontSize="11.5" Opacity="0.75"
                                HorizontalAlignment="Center" TextWrapping="Wrap" />
 
-                    <Button Classes="PclLaunch" Command="{Binding LaunchSelectedInstanceCommand}"
-                            HorizontalAlignment="Stretch" Height="48">
+                    <Button Classes="launch" Command="{Binding LaunchSelectedInstanceCommand}"
+                            HorizontalAlignment="Stretch">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
                             <Path Data="M 0,0 L 0,14 L 12,7 Z" Fill="White" VerticalAlignment="Center" />
-                            <TextBlock Text="以此配置启动" FontWeight="Bold" FontSize="15" Foreground="White"
+                            <TextBlock Text="启动选定实例" FontWeight="Black" FontSize="16" Foreground="White"
                                        VerticalAlignment="Center" />
                         </StackPanel>
                     </Button>
@@ -63,15 +65,15 @@
             </Grid>
         </Border>
 
-        <!-- 右侧卡片式实例列表 -->
-        <Border Grid.Column="1" Padding="24,20">
-            <Grid RowDefinitions="Auto,*">
-                <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
-                    <TextBlock Grid.Column="0" Text="本地已安装实例列表" FontWeight="Bold" FontSize="15" VerticalAlignment="Center" />
-                    <Button Grid.Column="1" Content="刷新实例" Command="{Binding RefreshInstancesCommand}" Padding="8,4" FontSize="12" />
+        <!-- 右侧卡片式本地实例列表 (PanRight) -->
+        <ScrollViewer Grid.Column="1" Margin="20,18">
+            <StackPanel Spacing="12" MaxWidth="580" HorizontalAlignment="Left">
+                <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,4">
+                    <TextBlock Grid.Column="0" Text="本地 .minecraft/versions 实例清单" FontWeight="Bold" FontSize="15" VerticalAlignment="Center" />
+                    <Button Grid.Column="1" Content="刷新" Command="{Binding RefreshInstancesCommand}" Padding="8,3" FontSize="11" />
                 </Grid>
 
-                <ListBox Grid.Row="1" ItemsSource="{Binding Instances}"
+                <ListBox ItemsSource="{Binding Instances}"
                          SelectedItem="{Binding SelectedInstance}"
                          Background="Transparent">
                     <ListBox.Styles>
@@ -85,44 +87,24 @@
                     </ListBox.Styles>
                     <ListBox.ItemTemplate>
                         <DataTemplate x:DataType="vm:LocalInstanceItemViewModel">
-                            <Border Background="{DynamicResource NeoColorGray8Brush}"
-                                    BorderBrush="{DynamicResource NeoColorGray6Brush}"
-                                    BorderThickness="1" CornerRadius="8" Padding="14,10">
+                            <ctrl:NeoCard Padding="14,10">
                                 <Grid ColumnDefinitions="Auto,*">
-                                    <Border Grid.Column="0" Width="36" Height="36" Background="{DynamicResource NeoSystemAccentColorLight3Brush}"
-                                            CornerRadius="6" Margin="0,0,12,0" VerticalAlignment="Center">
+                                    <Border Grid.Column="0" Width="36" Height="36"
+                                            Background="{DynamicResource NeoSystemAccentColorLight3Brush}"
+                                            CornerRadius="4" Margin="0,0,12,0" VerticalAlignment="Center">
                                         <TextBlock Text="🎮" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                     </Border>
                                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
-                                        <TextBlock Text="{Binding Id}" FontWeight="Bold" FontSize="15" />
-                                        <TextBlock Text="{Binding Details}" FontSize="11" Opacity="0.65" TextWrapping="Wrap" />
+                                        <TextBlock Text="{Binding Id}" FontWeight="Bold" FontSize="14.5" />
+                                        <TextBlock Text="{Binding Details}" FontSize="11" Opacity="0.6" TextWrapping="Wrap" />
                                     </StackPanel>
                                 </Grid>
-                            </Border>
+                            </ctrl:NeoCard>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
-            </Grid>
-        </Border>
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
-
-    <UserControl.Styles>
-        <Style Selector="Button.PclLaunch">
-            <Setter Property="Background" Value="{DynamicResource NeoSystemAccentColorBrush}" />
-            <Setter Property="CornerRadius" Value="10" />
-            <Setter Property="Transitions">
-                <Transitions>
-                    <BrushTransition Duration="0:0:0.15" Property="Background" />
-                    <TransformOperationsTransition Duration="0:0:0.15" Property="RenderTransform" />
-                </Transitions>
-            </Setter>
-        </Style>
-        <Style Selector="Button.PclLaunch:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="{DynamicResource NeoSystemAccentColorLight2Brush}" />
-        </Style>
-        <Style Selector="Button.PclLaunch:pressed">
-            <Setter Property="RenderTransform" Value="scale(0.97)" />
-        </Style>
-    </UserControl.Styles>
 
 </UserControl>

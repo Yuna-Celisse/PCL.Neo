@@ -83,5 +83,28 @@
                 <Setter Property="BorderBrush" Value="{DynamicResource NeoButtonRedBorderBrushPointerOverBrush}" />
             </Style>
         </Style>
+
+        <!-- PCL 标志性巨型主启动按钮 (Highlight / Launch) -->
+        <Style Selector="^.launch">
+            <Setter Property="Background" Value="{DynamicResource NeoSystemAccentColorBrush}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="FontWeight" Value="Black" />
+            <Setter Property="FontSize" Value="17" />
+            <Setter Property="Height" Value="48" />
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Duration="0:0:0.15" Property="Background" />
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.18" Easing="QuinticEaseOut" />
+                </Transitions>
+            </Setter>
+            <Style Selector="^:pointerover">
+                <Setter Property="Background" Value="{DynamicResource NeoSystemAccentColorLight2Brush}" />
+            </Style>
+            <Style Selector="^:pressed">
+                <Setter Property="RenderTransform" Value="scale(0.965)" />
+            </Style>
+        </Style>
     </ControlTheme>
 </ResourceDictionary>
