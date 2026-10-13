@@ -23,6 +23,5 @@
 
     <PackageReference Include="YamlDotNet" Version="18.1.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.2" />
-    <PackageReference Include="System.Text.Json" Version="9.0.2" />
   </ItemGroup>
 </Project>

@@ -21,7 +21,7 @@
                         <StackPanel Spacing="10">
                             <StackPanel Spacing="4">
                                 <TextBlock Text="离线游戏名" FontSize="11.5" Opacity="0.75" />
-                                <TextBox Text="{Binding PlayerName}" Watermark="昵称" Height="30" FontSize="12.5" />
+                                <TextBox Text="{Binding PlayerName}" PlaceholderText="昵称" Height="30" FontSize="12.5" />
                             </StackPanel>
 
                             <StackPanel Spacing="4">
