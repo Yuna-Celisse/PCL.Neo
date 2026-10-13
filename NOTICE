@@ -33,3 +33,15 @@ PCL Community Edition (PCL-CE)
 第三方依赖
 ────────────────────────────────────────────────────────────────────────
 各依赖的许可以 NuGet 包内声明为准，发布产物需随附第三方声明。
+
+────────────────────────────────────────────────────────────────────────
+从 PCL-CE (PCL.Core) 深度移植核心模块登记表 (Apache-2.0)
+────────────────────────────────────────────────────────────────────────
+| 目标路径 (PCL.Neo.Core) | 来源路径 (PCL-CE) | 说明 |
+| --- | --- | --- |
+| src/PCL.Neo.Core/Minecraft/Saves/ | PCL.Core/Minecraft/Saves/ | 全套 Minecraft 地图存档 NBT 解析、分版本数据适配与保存 |
+| src/PCL.Neo.Core/Minecraft/ResourceProject/ | PCL.Core/Minecraft/ResourceProject/ | Modrinth / CurseForge 数据模型与 Mod 依赖树解析算法 |
+| src/PCL.Neo.Core/Minecraft/NbtFileHandler.cs | PCL.Core/Minecraft/NbtFileHandler.cs | 底层 NBT 复合标签压缩与读写 |
+| src/PCL.Neo.Core/Logging/ | PCL.Core/Logging/ | 工业级日志包装器、格式化器与崩溃详情提取 |
+| src/PCL.Neo.Core/Utils/ | PCL.Core/Utils/ | 哈希算法、Diff 对比、安全校验与字符串扩展工具 |
+| tests/PCL.Neo.Tests/ImportedFromCE/ | PCL.Core.Test/ | 对应 Saves、Mod 依赖、MurmurHash2 的官方单元测试 |
